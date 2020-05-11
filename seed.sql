@@ -11,6 +11,6 @@ VALUES
 
 INSERT INTO employee_trackerdb.employee (first_name, last_name, role_id, manager_id)
 VALUES 
-("Bourdain", "Anthony", "1", "1"), ("Ramsay", "Gordon", "2", "1"), ("Oliver", "Jamie", "3", "1"), 
-("Titschmarsh", "Alan", "4", "4"), ("Don", "Monty", "0005", "4"), ("Albone", "Charlie", "6", "4"),
-("Obrist", "Hans-Ulrich", "7", "7"), ("Kahlo", "Frida", "8", "7"), ("McCartney", "Jamie", "9", "7");
+("Anthony", "Bourdain", "1", "1"), ("Gordon", "Ramsay", "2", "1"), ("Jamie", "Oliver", "3", "1"), 
+("Alan", "Titschmarsh", "4", "4"), ("Monty", "Don", "0005", "4"), ("Charlie", "Albone", "6", "4"),
+("Hans-Ulrich", "Obrist", "7", "7"), ("Frida", "Kahlo", "8", "7"), ("Jamie", "McCartney", "9", "7");

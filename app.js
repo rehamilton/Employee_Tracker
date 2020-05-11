@@ -42,6 +42,7 @@ function getStarted() {
         switch(choice.selection) {
             case "View all Employees":
                 viewAll()
+                
                 return;
             case "View Employees by Department":
                 employeeDepartment()
@@ -74,8 +75,23 @@ function viewAll () {
     con.query(getSQLquery(), function(err,result) {
         if (err) throw err;
         console.table(result)
-    });
 
+        getStarted()   
+    });
+};
+
+function employeeDepartment () {
+
+    getSQLquery = function () {
+        return `SELECT name FROM department`
+    };
+    
+    con.query(getSQLquery(), function(err,result) {
+        if (err) throw err;
+        console.log(result);
+
+        getStarted()   
+    });
 };
 
 function addEmployee() {
