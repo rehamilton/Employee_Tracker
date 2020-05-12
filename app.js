@@ -1,6 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer")
 
+
+
 const con = mysql.createConnection({
     host: 'localhost', // where mysql is located 
     user: 'root', // your mysql username
@@ -13,16 +15,9 @@ con.connect(function(err) {
     console.log("Connected!");
 });
 
-const myQueryText = "";
 
-function runQuery(myQueryText) {
-    const  myQuery = con.query(myQueryText, function(err,res) {
-        if (err) throw err;
-        return res
-    })
-}
 
-function getStarted() {
+async function init() {
     inquirer
     .prompt([{
         type: "list",
@@ -30,23 +25,32 @@ function getStarted() {
         message: "What would you like to do?",
         choices: [
             "View all Employees",
+            "View all Departments",
+            "View all Roles",
             "View Employees by Department",
             "View Employees By Manager",
             "Add Employee",
             "Remove Employee",
             "Update Employee Role",
-            "Update Employee Manager"
+            "Update Employee Manager",
+            "Exit"
         ]
     }])
     .then(choice => {
         switch(choice.selection) {
             case "View all Employees":
-                viewAll()
-                
+                viewAll() 
                 return;
-            case "View Employees by Department":
-                employeeDepartment()
+            case "View all Departments":
+                getDepartments() 
                 return;
+            case "View all roles":
+                getRoles() 
+                return;
+            case "View Employees by Department": {
+                getDepartmentID();
+                break;
+            }
             case "View Employees By Manager":
                 employeeManager()
                 return
@@ -62,11 +66,14 @@ function getStarted() {
             case "Update Employee Manager":
                 updateManager()
                 return
+            case "Exit":
+                //add in connection end
+                break
         }
     }) 
 }
 
-function viewAll () {
+async function viewAll () {
 
     getSQLquery = function () {
         return `SELECT * FROM employee`
@@ -76,25 +83,81 @@ function viewAll () {
         if (err) throw err;
         console.table(result)
 
-        getStarted()   
+        init()   
     });
 };
 
-function employeeDepartment () {
+function getDepartments() {
 
     getSQLquery = function () {
-        return `SELECT name FROM department`
-    };
+        return `SELECT * FROM department`
+    }
     
-    con.query(getSQLquery(), function(err,result) {
+    con.query(getSQLquery(), function(err, result){
         if (err) throw err;
-        console.log(result);
 
-        getStarted()   
+        console.table(result)
+
+        init()
     });
+
 };
 
-function addEmployee() {
+function getRoles() {
+
+    getSQLquery = function () {
+        return `SELECT * FROM role`
+    }
+    
+    con.query(getSQLquery(), function(err, result){
+        if (err) throw err;
+
+        console.table(result)
+
+        init()
+    });
+
+};
+
+async function getDepartmentID () {
+    
+    let departments = await getDepartments()
+
+    console.log(departments);
+
+    // inquirer.prompt([{
+    //     type: "list",
+    //     name: "selection",
+    //     message: "What would you like to do?",
+    //     choices: departments
+    // }]).then(choice => {
+        
+        
+    //     deptID = `SELECT id FROM department WHERE name = "${choice.selection}"`
+        
+    //     // query = `SELECT * FROM department
+    //     // RIGHT JOIN role
+    //     // ON ${dpetID} = department_id`
+
+    //     console.log(choice);
+    //     console.log({deptID});
+
+    //     con.query(deptID, function(err,result) {
+    //         if (err) throw err;
+    //         console.log(result);
+
+    //         getRoles(result)
+       
+    //     });
+    // })
+
+};
+
+function getRoles(result) {
+
+}
+
+async function addEmployee() {
     inquirer
     .prompt([{
         type: "input",
@@ -124,4 +187,4 @@ function addEmployee() {
     })
 }
 
-getStarted()
+init()
