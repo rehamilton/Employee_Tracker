@@ -29,6 +29,7 @@ async function init() {
             "View Employees by Department",
             "View Employees By Manager",
             "Add Employee",
+            "Add Department",
             "Remove Employee",
             "Update Employee Role",
             "Update Employee Manager",
@@ -54,6 +55,9 @@ async function init() {
                 return
             case "Add Employee":
                 addEmployee()
+                return
+            case "Add Department":
+                addDepartment()
                 return
             case "Remove Employee":
                 removeEmployee()
@@ -155,7 +159,7 @@ async function getDepartmentID () {
 
 };
 
-
+// function to add employee
 async function addEmployee() {
     inquirer
     .prompt([{
@@ -184,6 +188,26 @@ async function addEmployee() {
             function (err, res){
                 if (err) console.log(err);
                 console.log("employee successfully added")
+
+            init()
+        })
+    })
+};
+
+
+async function addDepartment() {
+    inquirer
+    .prompt([{
+        type: "input",
+        name: "name",
+        message: "What is the department's name?"
+    }])
+    .then(response => {
+        console.log(response);
+        con.query(`INSERT INTO department (name) VALUES ("${response.name}")`, 
+            function (err, res){
+                if (err) console.log(err);
+                console.log("department successfully added")
 
             init()
         })
