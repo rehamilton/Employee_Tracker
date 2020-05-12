@@ -30,6 +30,7 @@ async function init() {
             "View Employees By Manager",
             "Add Employee",
             "Add Department",
+            "Add Role",
             "Remove Employee",
             "Update Employee Role",
             "Update Employee Manager",
@@ -58,6 +59,9 @@ async function init() {
                 return
             case "Add Department":
                 addDepartment()
+                return
+            case "Add Role":
+                addRole()
                 return
             case "Remove Employee":
                 removeEmployee()
@@ -194,7 +198,6 @@ async function addEmployee() {
     })
 };
 
-
 async function addDepartment() {
     inquirer
     .prompt([{
@@ -208,6 +211,35 @@ async function addDepartment() {
             function (err, res){
                 if (err) console.log(err);
                 console.log("department successfully added")
+
+            init()
+        })
+    })
+};
+
+async function addRole() {
+    inquirer
+    .prompt([{
+        type: "input",
+        name: "title",
+        message: "What is the role title?"
+    },
+    {
+        type: "input",
+        name: "salary",
+        message: "What is the role's base salary?"
+    },
+    {
+        type: "input",
+        name: "department_id",
+        message: "What is the role's department ID?"
+    }])
+    .then(response => {
+        console.log(response);
+        con.query(`INSERT INTO role (title, salary, department_id) VALUES ("${response.title}", "${response.salary}", "${response.department_id}")`, 
+            function (err, res){
+                if (err) console.log(err);
+                console.log("role successfully added")
 
             init()
         })
