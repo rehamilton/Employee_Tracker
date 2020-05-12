@@ -160,25 +160,27 @@ async function addEmployee() {
     inquirer
     .prompt([{
         type: "input",
-        name: "category",
-        message: "What category would you like to post your item to?",
-        default: "electronics"
+        name: "first_name",
+        message: "What is the employee's first name?"
     },
     {
         type: "input",
-        name: "item_name",
-        message: "What item would you like to post?",
-        default: "mobile phone"
+        name: "last_name",
+        message: "What is the employee's last name?"
     },
     {
         type: "input",
-        name: "starting_bid",
-        message: "What would you like the starting bid to be?",
-        default: "5"
-    },])
+        name: "role_id",
+        message: "What is the employee's role ID?"
+    },
+    {
+        type: "input",
+        name: "manager_id",
+        message: "What is the employees manager's ID?"
+    }])
     .then(response => {
         console.log(response);
-        con.query(`INSERT INTO auctions (item_name, category, starting_bid) VALUES ("${response.item_name}", "${response.category}", "${response.starting_bid}")`, 
+        con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${response.first_name}", "${response.last_name}", "${response.role_id}", "${response.manager_id}")`, 
             function (err, res){
                 if (err) console.log(err);
                 return res;
