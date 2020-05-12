@@ -15,8 +15,7 @@ con.connect(function(err) {
     console.log("Connected!");
 });
 
-
-
+// initiating function
 async function init() {
     inquirer
     .prompt([{
@@ -44,13 +43,12 @@ async function init() {
             case "View all Departments":
                 getDepartments() 
                 return;
-            case "View all roles":
+            case "View all Roles":
                 getRoles() 
                 return;
-            case "View Employees by Department": {
+            case "View Employees by Department":
                 getDepartmentID();
                 break;
-            }
             case "View Employees By Manager":
                 employeeManager()
                 return
@@ -75,11 +73,11 @@ async function init() {
 
 async function viewAll () {
 
-    getSQLquery = function () {
+    employeeSQLquery = function () {
         return `SELECT * FROM employee`
     };
 
-    con.query(getSQLquery(), function(err,result) {
+    con.query(employeeSQLquery(), function(err,result) {
         if (err) throw err;
         console.table(result)
 
@@ -89,11 +87,11 @@ async function viewAll () {
 
 function getDepartments() {
 
-    getSQLquery = function () {
+    deptSQLquery = function () {
         return `SELECT * FROM department`
     }
     
-    con.query(getSQLquery(), function(err, result){
+    con.query(deptSQLquery(), function(err, result){
         if (err) throw err;
 
         console.table(result)
@@ -103,11 +101,15 @@ function getDepartments() {
 
 };
 
-function getRoles() {
+async function getRoles() {
+
+    console.log("roles");
 
     getSQLquery = function () {
         return `SELECT * FROM role`
     }
+
+    console.log(getSQLquery);
     
     con.query(getSQLquery(), function(err, result){
         if (err) throw err;
@@ -153,9 +155,6 @@ async function getDepartmentID () {
 
 };
 
-function getRoles(result) {
-
-}
 
 async function addEmployee() {
     inquirer
