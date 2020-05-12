@@ -183,9 +183,11 @@ async function addEmployee() {
         con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${response.first_name}", "${response.last_name}", "${response.role_id}", "${response.manager_id}")`, 
             function (err, res){
                 if (err) console.log(err);
-                return res;
+                console.log("employee successfully added")
+
+            init()
         })
     })
-}
+};
 
 init()
