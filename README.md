@@ -23,7 +23,7 @@ Build a command-line application that at a minimum allows the user to:
 
   * View departments, roles, employees
 
- \ * Update employee roles
+  * Update employee roles
 
 
 ```
@@ -43,14 +43,14 @@ npm install mysql
 
 ## Video
 
-![./Assets/video.mp4](https://github.com/rehamilton/Employee_Summary/blob/master/Assets/video.mp4)
+![./Assets/video.mp4](https://github.com/rehamilton/Employee_Tracker/blob/master/Assets/video.mp4)
 
 
 ## Walkthrough
 
 Below is a visual runthrough of how the application works
 
-![./Assets/Workflow.png](https://github.com/rehamilton/Employee_Summary/blob/master/Assets/Workflow.PNG)
+![./Assets/Workflow.png](https://github.com/rehamilton/Employee_Tracker/blob/master/Assets/Workflow.PNG)
 
 
 ## Questions
