@@ -15,12 +15,11 @@ async function init() {
             "View all Employees",
             "View all Departments",
             "View all Roles",
-            "Update Employee",
             // "View Employees By Manager",
             "Add Employee",
             "Add Department",
             "Add Role",
-            // "Remove Employee",
+            "Remove Employee",
             "Update Employee Role",
             // "Update Employee Manager",
             "Exit"
@@ -37,9 +36,6 @@ async function init() {
             case "View all Roles":
                 getRoles() 
                 return;
-            case "View Employees By Manager":
-                employeeManager()
-                return
             case "Add Employee":
                 addEmployee()
                 return
@@ -49,27 +45,27 @@ async function init() {
             case "Add Role":
                 addRole()
                 return
-            case "Update Employee":
-                updateEmployee()
-                return
             case "Remove Employee":
                 removeEmployee()
                 return
             case "Update Employee Role":
                 updateRole()
                 return
+            case "View Employees By Manager":
+                employeeManager()
+                return
             case "Update Employee Manager":
                 updateManager()
                 return
             case "Exit":
                 //add in connection end
+                con.end()
                 break
         }
     }) 
 }
 
 async function viewAll () {
-
     employeeSQLquery = function () {
         return `SELECT * FROM employee`
     };
@@ -83,7 +79,6 @@ async function viewAll () {
 };
 
 function getDepartments() {
-
     deptSQLquery = function () {
         return `SELECT * FROM department`
     }
@@ -95,18 +90,14 @@ function getDepartments() {
 
         init()
     });
-
 };
 
 async function getRoles() {
-
     console.log("roles");
 
     getSQLquery = function () {
         return `SELECT * FROM role`
     }
-
-    console.log(getSQLquery);
     
     con.query(getSQLquery(), function(err, result){
         if (err) throw err;
@@ -115,7 +106,6 @@ async function getRoles() {
 
         init()
     });
-
 };
 
 // function to add employee
@@ -176,6 +166,8 @@ async function addEmployee() {
     }])
     .then(response => {
         console.log(response);
+
+
         con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, response.role_id, response.manager_id],
             function (err, res){
                 if (err) console.log(err);
@@ -260,41 +252,94 @@ async function addRole() {
 
 function updateRole() {
     let employeeList = [];
-    con.query("SELECT * FROM employee", function(err, answer) {
-            
+    let roleList = []
+    con.query("SELECT * FROM employee;SELECT * FROM role", function(err, answer) {
+
+        let employees = answer[0]
+        let roles = answer[1]
         
-      for (let i = 0; i < answer.length; i++) {
+            
+      for (let i = 0; i < employees.length; i++) {
         let employeeName =
-          answer[i].id + " " + answer[i].first_name + " " + answer[i].last_name;
+          employees[i].id + " " + employees[i].first_name + " " + employees[i].last_name;
         employeeList.push(employeeName);
       }
+
+      for (let i = 0; i < roles.length; i++) {
+        let roleName =
+          roles[i].id + " " + roles[i].title;
+        roleList.push(roleName);
+      }
       
-      console.log(employeeList);
+        console.log({employeeList});
+        console.log({roleList});
+
       inquirer
         .prompt([
           {
             type: "list",
-            name: "updateEmpRole",
+            name: "employee",
             message: "select employee to update role",
             choices: employeeList
           },
           {
             type: "list",
-            name: "newrole",
-            message: "select new role",
-            message: "What is the Employee's new Role?"
-
+            name: "newRole",
+            message: "What is the Employee's new Role?",
+            choices: roleList
           }
         ])
         .then(response => {
 
+            let employee = response.employee
+            let role = response.newRole
+
+            console.log(employee);
+            console.log(role);
+
+            let employeeid = employee.slice(0, 1)
+            let roleid = role.slice(0, 1)
+
+            console.log(employeeid);
+            console.log(roleid);
             
+            con.query(`UPDATE employee SET role_id = "${roleid}" WHERE id = "${employeeid}"`,
+            function (err, res){
+                if (err) console.log(err);
+                console.log("role successfully updated")
 
-            console.log(response);
-
-            // con.query(`UPDATE employee SET role_id = ? WHERE first_name = ?`[response.newrole ])
+            init()
+            })
         });
     });
-  }
+}
+
+function removeEmployee() {
+
+    inquirer
+    .prompt([{
+        type: "input",
+        name: "first_name",
+        message: "What is the Employee's first name?"
+    },
+    {
+        type: "input",
+        name: "last_name",
+        message: "What is the Employee's last name?"
+    }])
+    .then(response => {
+
+        query = `DELETE FROM employee WHERE first_name= ? AND last_name = ?`
+
+        con.query(query, [response.first_name, response.last_name], function(err, res) {
+            if (err) console.log(err);
+                console.log("employee successfully deleted")
+
+            init()
+        })
+
+    })
+}
+
 
 init()

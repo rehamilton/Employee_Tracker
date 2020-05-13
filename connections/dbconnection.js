@@ -7,7 +7,8 @@ const con = mysql.createConnection({
     host: 'localhost', // where mysql is located 
     user: 'root', // your mysql username
     password: 'root', // your mysql password,
-    database: "employee_trackerdb"
+    database: "employee_trackerdb",
+    multipleStatements: true
 })
 
 con.connect(function(err) {
