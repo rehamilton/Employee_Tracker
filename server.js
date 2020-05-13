@@ -121,6 +121,14 @@ async function getRoles() {
 // function to add employee
 async function addEmployee() {
 
+    const employee = await queries.allEmployees();
+    const employeeList = departments.map(({id, first_name, last_name}) => ({
+        name: first_name + " " + last_name,
+        value: id
+    }))
+
+    console.log(employeeList);
+
     inquirer
     .prompt([{
         type: "input",
