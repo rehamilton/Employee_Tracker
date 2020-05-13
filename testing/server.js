@@ -1,7 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer")
-const con = require("./connections/dbconnection")
-const queries = require("./connections/queries")
+const con = require("../connections/dbconnection")
+const queries = require("../connections/queries")
 
 
 // initiating function
@@ -121,11 +121,12 @@ async function getRoles() {
 // function to add employee
 async function addEmployee() {
 
-    const employee = await queries.allEmployees();
-    const employeeList = departments.map(({id, first_name, last_name}) => ({
+    const employees = await queries.allEmployees();
+    const employeeList = employees.map(({id, first_name, last_name}) => ({
         name: first_name + " " + last_name,
         value: id
     }))
+;
 
     console.log(employeeList);
 
@@ -241,4 +242,11 @@ function updateEmployee() {
     });
   }
 
+  async function allEmployees() {
+
+    return con.query(`SELECT * FROM employee`)
+
+  }
+
 init()
+

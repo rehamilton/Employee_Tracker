@@ -125,26 +125,58 @@ async function addEmployee() {
     .prompt([{
         type: "input",
         name: "first_name",
-        message: "What is the employee's first name?"
+        message: "What is the employee's first name?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("FIRST NAME REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     },
     {
         type: "input",
         name: "last_name",
-        message: "What is the employee's last name?"
+        message: "What is the employee's last name?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("LAST NAME REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     },
     {
         type: "input",
         name: "role_id",
-        message: "What is the employee's role ID?"
+        message: "What is the employee's role ID?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("ROLE ID REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     },
     {
         type: "input",
         name: "manager_id",
-        message: "What is the employees manager's ID?"
+        message: "What is the employees manager's ID?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("MANAGER ID REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     }])
     .then(response => {
         console.log(response);
-        con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${response.first_name}", "${response.last_name}", "${response.role_id}", "${response.manager_id}")`, 
+        con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, response.role_id, response.manager_id],
             function (err, res){
                 if (err) console.log(err);
                 console.log("employee successfully added")
@@ -163,7 +195,7 @@ async function addDepartment() {
     }])
     .then(response => {
         console.log(response);
-        con.query(`INSERT INTO department (name) VALUES ("${response.name}")`, 
+        con.query(`INSERT INTO department (name) VALUES (?)`,[response.name], 
             function (err, res){
                 if (err) console.log(err);
                 console.log("department successfully added")
@@ -178,21 +210,45 @@ async function addRole() {
     .prompt([{
         type: "input",
         name: "title",
-        message: "What is the role title?"
+        message: "What is the role title?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("ROLE TITLE REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     },
     {
         type: "input",
         name: "salary",
-        message: "What is the role's base salary?"
+        message: "What is the role's base salary?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("SALARY REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     },
     {
         type: "input",
         name: "department_id",
-        message: "What is the role's department ID?"
+        message: "What is the role's department ID?",
+        validate: function(input) {
+            if (input ===""){
+                console.log("DEPARTMENT ID REQUIRED");
+                return false;
+            }else{
+                return true
+            }
+        }
     }])
     .then(response => {
         console.log(response);
-        con.query(`INSERT INTO role (title, salary, department_id) VALUES ("${response.title}", "${response.salary}", "${response.department_id}")`, 
+        con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, response.department_id], 
             function (err, res){
                 if (err) console.log(err);
                 console.log("role successfully added")
@@ -202,17 +258,18 @@ async function addRole() {
     })
 };
 
-function updateEmployee() {
+function updateRole() {
     let employeeList = [];
     con.query("SELECT * FROM employee", function(err, answer) {
-      // console.log(answer);
+            
+        
       for (let i = 0; i < answer.length; i++) {
         let employeeName =
           answer[i].id + " " + answer[i].first_name + " " + answer[i].last_name;
         employeeList.push(employeeName);
       }
       
-  
+      console.log(employeeList);
       inquirer
         .prompt([
           {
@@ -229,7 +286,14 @@ function updateEmployee() {
 
           }
         ])
-        .then();
+        .then(response => {
+
+            
+
+            console.log(response);
+
+            // con.query(`UPDATE employee SET role_id = ? WHERE first_name = ?`[response.newrole ])
+        });
     });
   }
 
