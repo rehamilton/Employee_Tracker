@@ -1,8 +1,10 @@
-const mysql = require("mysql");
 const inquirer = require("inquirer")
-const con = require("./connections/dbconnection")
-const queries = require("./connections/queries")
+const con = require("./config/dbconnection")
+const list = require("./config/lists")
 
+const allEmployeeQuery = `SELECT * FROM employee`;
+const allRoleQuery = `SELECT * FROM role`;
+const allDepartmentQuery = `SELECT * FROM department`;
 
 // initiating function
 async function init() {
@@ -15,20 +17,19 @@ async function init() {
             "View all Employees",
             "View all Departments",
             "View all Roles",
-            // "View Employees By Manager",
             "Add Employee",
             "Add Department",
             "Add Role",
             "Remove Employee",
             "Update Employee Role",
-            // "Update Employee Manager",
+            "Update Employee Manager",
             "Exit"
         ]
     }])
     .then(choice => {
         switch(choice.selection) {
             case "View all Employees":
-                viewAll() 
+                getEmployees() 
                 return;
             case "View all Departments":
                 getDepartments() 
@@ -51,9 +52,6 @@ async function init() {
             case "Update Employee Role":
                 updateRole()
                 return
-            case "View Employees By Manager":
-                employeeManager()
-                return
             case "Update Employee Manager":
                 updateManager()
                 return
@@ -61,16 +59,13 @@ async function init() {
                 //add in connection end
                 con.end()
                 break
-        }
-    }) 
-}
+        };
+    });
+};
 
-async function viewAll () {
-    employeeSQLquery = function () {
-        return `SELECT * FROM employee`
-    };
-
-    con.query(employeeSQLquery(), function(err,result) {
+async function getEmployees () {
+    
+    con.query(allEmployeeQuery, function(err,result) {
         if (err) throw err;
         console.table(result)
 
@@ -79,13 +74,9 @@ async function viewAll () {
 };
 
 function getDepartments() {
-    deptSQLquery = function () {
-        return `SELECT * FROM department`
-    }
     
-    con.query(deptSQLquery(), function(err, result){
+    con.query(allDepartmentQuery, function(err, result){
         if (err) throw err;
-
         console.table(result)
 
         init()
@@ -93,15 +84,9 @@ function getDepartments() {
 };
 
 async function getRoles() {
-    console.log("roles");
-
-    getSQLquery = function () {
-        return `SELECT * FROM role`
-    }
-    
-    con.query(getSQLquery(), function(err, result){
+   
+    con.query(allRoleQuery, function(err, result){
         if (err) throw err;
-
         console.table(result)
 
         init()
@@ -111,79 +96,78 @@ async function getRoles() {
 // function to add employee
 async function addEmployee() {
 
-    inquirer
-    .prompt([{
-        type: "input",
-        name: "first_name",
-        message: "What is the employee's first name?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("FIRST NAME REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    },
-    {
-        type: "input",
-        name: "last_name",
-        message: "What is the employee's last name?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("LAST NAME REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    },
-    {
-        type: "input",
-        name: "role_id",
-        message: "What is the employee's role ID?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("ROLE ID REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    },
-    {
-        type: "input",
-        name: "manager_id",
-        message: "What is the employees manager's ID?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("MANAGER ID REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    }])
-    .then(response => {
-        console.log(response);
+    con.query(`${allEmployeeQuery};${allRoleQuery}`, function(err, res) {
 
+        let employeeList = list.employeeListPush(res[0])
+        let roleList = list.roleListPush(res[1])
 
-        con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, response.role_id, response.manager_id],
-            function (err, res){
-                if (err) console.log(err);
-                console.log("employee successfully added")
+        inquirer
+        .prompt([{
+            type: "input",
+            name: "first_name",
+            message: "What is the employee's first name?",
+            validate: function(input) {
+                if (input ===""){
+                    return "FIRST NAME REQUIRED";
+                }else{
+                    return true
+                }
+            }
+        },
+        {
+            type: "input",
+            name: "last_name",
+            message: "What is the employee's last name?",
+            validate: function(input) {
+                if (input ===""){
+                    return "LAST NAME REQUIRED";
+                }else{
+                    return true
+                }
+            }
+        },
+        {
+            type: "list",
+            name: "role",
+            message: "What is the employee's role?",
+            choices: roleList
+        },
+        {
+            type: "list",
+            name: "manager",
+            message: "What is the employees manager's ID?",
+            choices: employeeList
+        }])
+        .then(response => {
 
-            init()
-        })
-    })
+            //Get id's back from employee and role strings
+            let managerid = response.manager.slice(0, 3)
+            let roleid = response.role.slice(0, 3)
+
+            con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, roleid, managerid],
+                function (err, res){
+                    if (err) console.log(err);
+                    console.log("employee successfully added")
+
+                init()
+            });
+        });
+    });
 };
 
-async function addDepartment() {
+function addDepartment() {
     inquirer
     .prompt([{
         type: "input",
         name: "name",
-        message: "What is the department's name?"
+        message: "What is the department's name?",
+        validate: function(input) {
+            if (input ===""){
+                return "DEPARTMENT NAME REQUIRED";
+            }else{
+                return true
+            }
+        }
     }])
     .then(response => {
         console.log(response);
@@ -193,96 +177,81 @@ async function addDepartment() {
                 console.log("department successfully added")
 
             init()
-        })
-    })
+        });
+    });
 };
 
-async function addRole() {
-    inquirer
-    .prompt([{
-        type: "input",
-        name: "title",
-        message: "What is the role title?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("ROLE TITLE REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    },
-    {
-        type: "input",
-        name: "salary",
-        message: "What is the role's base salary?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("SALARY REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    },
-    {
-        type: "input",
-        name: "department_id",
-        message: "What is the role's department ID?",
-        validate: function(input) {
-            if (input ===""){
-                console.log("DEPARTMENT ID REQUIRED");
-                return false;
-            }else{
-                return true
-            }
-        }
-    }])
-    .then(response => {
-        console.log(response);
-        con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, response.department_id], 
-            function (err, res){
-                if (err) console.log(err);
-                console.log("role successfully added")
+function addRole() {
 
-            init()
-        })
-    })
+    con.query(allDepartmentQuery, function(err,res) {
+
+        let departmentList = list.departmentListPush(res)
+
+        inquirer
+        .prompt([{
+            type: "input",
+            name: "title",
+            message: "What is the role title?",
+            validate: function(input) {
+                if (input ===""){
+                    return "ROLE TITLE REQUIRED";
+                }else{
+                    return true
+                }
+            }
+        },
+        {
+            type: "input",
+            name: "salary",
+            message: "What is the role's base salary?",
+            validate: function(input) {
+                if (input ===""){
+                    return "SALARY REQUIRED";
+                }else{
+                    return true
+                }
+            }
+        },
+        {
+            type: "list",
+            name: "department",
+            message: "Which department does the role belong to?",
+            choices: departmentList
+        }])
+        .then(response => {
+            // console.log(response);
+            let departmentid = response.department.slice(0, 3)
+
+            con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, departmentid], 
+                function (err, res){
+                    if (err) console.log(err);
+                    console.log("role successfully added")
+
+                init()
+            });
+        });
+    });
 };
 
-function updateRole() {
-    let employeeList = [];
-    let roleList = []
-    con.query("SELECT * FROM employee;SELECT * FROM role", function(err, answer) {
+async function updateRole() {
+    
+    //use muliple statement to retrieve info from role table and employee table
+    con.query(`${allEmployeeQuery};${allRoleQuery}`, function(err, res) {
 
-        let employees = answer[0]
-        let roles = answer[1]
-        
-            
-      for (let i = 0; i < employees.length; i++) {
-        let employeeName =
-          employees[i].id + " " + employees[i].first_name + " " + employees[i].last_name;
-        employeeList.push(employeeName);
-      }
-
-      for (let i = 0; i < roles.length; i++) {
-        let roleName =
-          roles[i].id + " " + roles[i].title;
-        roleList.push(roleName);
-      }
-      
-        console.log({employeeList});
-        console.log({roleList});
+        let employeeList = list.employeeListPush(res[0])
+        let roleList = list.roleListPush(res[1])
 
       inquirer
         .prompt([
           {
+            //Ask user to choose from employee list
             type: "list",
             name: "employee",
             message: "select employee to update role",
             choices: employeeList
           },
           {
+            //ask user to choose from role list
             type: "list",
             name: "newRole",
             message: "What is the Employee's new Role?",
@@ -291,55 +260,93 @@ function updateRole() {
         ])
         .then(response => {
 
-            let employee = response.employee
-            let role = response.newRole
+            //Get id's back from employee and role strings
+            let employeeid = response.employee.slice(0, 3)
+            let roleid = response.newRole.slice(0, 3)
 
-            console.log(employee);
-            console.log(role);
-
-            let employeeid = employee.slice(0, 1)
-            let roleid = role.slice(0, 1)
-
-            console.log(employeeid);
-            console.log(roleid);
-            
+            //Update employee table based on employee and role selection using id's
             con.query(`UPDATE employee SET role_id = "${roleid}" WHERE id = "${employeeid}"`,
             function (err, res){
                 if (err) console.log(err);
                 console.log("role successfully updated")
 
             init()
-            })
+            });
         });
     });
-}
+};
+
+function updateManager() {
+    //declare arrays to be used to store user choices
+    
+
+    //use statement to retrieve info from employee table
+    con.query(`${allEmployeeQuery}`, function(err, res) {
+
+        let employeeList = list.employeeListPush(res)
+        let managerList = list.managerListPush(res)
+      
+        inquirer
+        .prompt([
+          {
+            //Ask user to choose from employee list
+            type: "list",
+            name: "employee",
+            message: "select employee to update role",
+            choices: employeeList
+          },
+          {
+            //ask user to choose manager from employee list
+            type: "list",
+            name: "manager",
+            message: "Who is the Employee's new Manager?",
+            choices: managerList
+          }
+        ])
+        .then(response => {
+
+            //Get id's back from employee and manager strings
+            let employeeid = response.employee.slice(0, 3)
+            let managerid = response.manager.slice(0, 3)
+
+            //Update employee table based on employee and manager selection using id's
+            con.query(`UPDATE employee SET manager_id = "${managerid}" WHERE id = "${employeeid}"`,
+            function (err, res){
+                if (err) console.log(err);
+                console.log("manager successfully updated")
+
+            init()
+            });
+        });
+    });
+};
 
 function removeEmployee() {
 
-    inquirer
-    .prompt([{
-        type: "input",
-        name: "first_name",
-        message: "What is the Employee's first name?"
-    },
-    {
-        type: "input",
-        name: "last_name",
-        message: "What is the Employee's last name?"
-    }])
-    .then(response => {
+    con.query(allEmployeeQuery, function(err,res) {
 
-        query = `DELETE FROM employee WHERE first_name= ? AND last_name = ?`
+        let employeeList = list.employeeListPush(res)
 
-        con.query(query, [response.first_name, response.last_name], function(err, res) {
-            if (err) console.log(err);
-                console.log("employee successfully deleted")
+        inquirer
+        .prompt([{
+            type: "list",
+            name: "employee",
+            message: "Which Employee would you ike to delete?",
+            choices: employeeList
+        }])
+        .then(response => {
 
-            init()
-        })
+            let employeeid = response.employee.slice(0, 3)
 
-    })
-}
+            //remove employee only if first and last name match inputs
+            con.query(`DELETE FROM employee WHERE id= ?`, [employeeid], function(err, res) {
+                if (err) console.log(err);
+                    console.log("employee successfully deleted")
 
+                init()
+            });
+        });
+    });
+};
 
 init()

@@ -37,7 +37,7 @@ So that I can organize and plan my business
 To install necessary dependencies, run the following command:
 
 ```
-npm install
+npm install inquirer
 npm install mysql
 ```
 

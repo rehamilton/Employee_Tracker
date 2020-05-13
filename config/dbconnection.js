@@ -1,7 +1,4 @@
 const mysql = require("mysql");
-const inquirer = require("inquirer")
-
-
 
 const con = mysql.createConnection({
     host: 'localhost', // where mysql is located 
