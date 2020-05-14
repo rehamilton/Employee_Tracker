@@ -141,10 +141,10 @@ async function addEmployee() {
         .then(response => {
 
             //Get id's back from employee and role strings
-            let managerid = response.manager.slice(0, 3)
-            let roleid = response.role.slice(0, 3)
+            let managerid = response.manager.split(" ")
+            let roleid = response.role.split(" ")
 
-            con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, roleid, managerid],
+            con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, roleid[0], managerid[0]],
                 function (err, res){
                     if (err) console.log(err);
                     console.log("employee successfully added")
@@ -220,9 +220,9 @@ function addRole() {
         }])
         .then(response => {
             // console.log(response);
-            let departmentid = response.department.slice(0, 3)
+            let departmentid = response.department.split(" ")
 
-            con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, departmentid], 
+            con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, departmentid[0]], 
                 function (err, res){
                     if (err) console.log(err);
                     console.log("role successfully added")
@@ -261,11 +261,11 @@ async function updateRole() {
         .then(response => {
 
             //Get id's back from employee and role strings
-            let employeeid = response.employee.slice(0, 3)
-            let roleid = response.newRole.slice(0, 3)
+            let employeeid = response.employee.split(" ")
+            let roleid = response.newRole.split(" ")
 
             //Update employee table based on employee and role selection using id's
-            con.query(`UPDATE employee SET role_id = "${roleid}" WHERE id = "${employeeid}"`,
+            con.query(`UPDATE employee SET role_id = "${roleid[0]}" WHERE id = "${employeeid[0]}"`,
             function (err, res){
                 if (err) console.log(err);
                 console.log("role successfully updated")
@@ -306,11 +306,11 @@ function updateManager() {
         .then(response => {
 
             //Get id's back from employee and manager strings
-            let employeeid = response.employee.slice(0, 3)
-            let managerid = response.manager.slice(0, 3)
+            let employeeid = response.employee.split(" ")
+            let managerid = response.manager.split(" ")
 
             //Update employee table based on employee and manager selection using id's
-            con.query(`UPDATE employee SET manager_id = "${managerid}" WHERE id = "${employeeid}"`,
+            con.query(`UPDATE employee SET manager_id = "${managerid[0]}" WHERE id = "${employeeid[0]}"`,
             function (err, res){
                 if (err) console.log(err);
                 console.log("manager successfully updated")
@@ -336,10 +336,10 @@ function removeEmployee() {
         }])
         .then(response => {
 
-            let employeeid = response.employee.slice(0, 3)
+            let employeeid = response.employee.split(" ")
 
             //remove employee only if first and last name match inputs
-            con.query(`DELETE FROM employee WHERE id= ?`, [employeeid], function(err, res) {
+            con.query(`DELETE FROM employee WHERE id= ?`, [employeeid[0]], function(err, res) {
                 if (err) console.log(err);
                     console.log("employee successfully deleted")
 
