@@ -64,7 +64,7 @@ async function init() {
 };
 
 async function getEmployees () {
-    
+    // get all results back from employee table
     con.query(allEmployeeQuery, function(err,result) {
         if (err) throw err;
         console.table(result)
@@ -74,7 +74,7 @@ async function getEmployees () {
 };
 
 function getDepartments() {
-    
+    //get all results back from department table
     con.query(allDepartmentQuery, function(err, result){
         if (err) throw err;
         console.table(result)
@@ -84,7 +84,7 @@ function getDepartments() {
 };
 
 async function getRoles() {
-   
+    //get all results back from role table
     con.query(allRoleQuery, function(err, result){
         if (err) throw err;
         console.table(result)
@@ -96,8 +96,9 @@ async function getRoles() {
 // function to add employee
 async function addEmployee() {
 
+    //get info from employee and role table
     con.query(`${allEmployeeQuery};${allRoleQuery}`, function(err, res) {
-
+        //create an array which holds each line as a string tous in choices
         let employeeList = list.employeeListPush(res[0])
         let roleList = list.roleListPush(res[1])
 
@@ -143,7 +144,7 @@ async function addEmployee() {
             //Get id's back from employee and role strings
             let managerid = response.manager.split(" ")
             let roleid = response.role.split(" ")
-
+            //insert new employee's info into the employee table
             con.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [response.first_name,response.last_name, roleid[0], managerid[0]],
                 function (err, res){
                     if (err) console.log(err);
@@ -155,7 +156,9 @@ async function addEmployee() {
     });
 };
 
+// function to add a department
 function addDepartment() {
+    //get department name (id is automatically generated)
     inquirer
     .prompt([{
         type: "input",
@@ -171,6 +174,7 @@ function addDepartment() {
     }])
     .then(response => {
         console.log(response);
+        //insert department details into the department table
         con.query(`INSERT INTO department (name) VALUES (?)`,[response.name], 
             function (err, res){
                 if (err) console.log(err);
@@ -181,12 +185,13 @@ function addDepartment() {
     });
 };
 
+//add a new role
 function addRole() {
-
+    //get all data from the department table
     con.query(allDepartmentQuery, function(err,res) {
-
+        //create an array which holds each line as a string to use in choices
         let departmentList = list.departmentListPush(res)
-
+    
         inquirer
         .prompt([{
             type: "input",
@@ -219,9 +224,9 @@ function addRole() {
             choices: departmentList
         }])
         .then(response => {
-            // console.log(response);
+            //Get id's back from employee and role strings
             let departmentid = response.department.split(" ")
-
+            //insert new role data into the role table
             con.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [response.title, response.salary, departmentid[0]], 
                 function (err, res){
                     if (err) console.log(err);
@@ -237,7 +242,7 @@ async function updateRole() {
     
     //use muliple statement to retrieve info from role table and employee table
     con.query(`${allEmployeeQuery};${allRoleQuery}`, function(err, res) {
-
+        //create an array which holds each line as a string to use in choices
         let employeeList = list.employeeListPush(res[0])
         let roleList = list.roleListPush(res[1])
 
@@ -282,7 +287,7 @@ function updateManager() {
 
     //use statement to retrieve info from employee table
     con.query(`${allEmployeeQuery}`, function(err, res) {
-
+        //create an array which holds each line as a string to use in choices
         let employeeList = list.employeeListPush(res)
         let managerList = list.managerListPush(res)
       
@@ -322,9 +327,9 @@ function updateManager() {
 };
 
 function removeEmployee() {
-
+    //get all data from the employee table
     con.query(allEmployeeQuery, function(err,res) {
-
+        //create an array which holds each line as a string to use in choices
         let employeeList = list.employeeListPush(res)
 
         inquirer
@@ -335,7 +340,7 @@ function removeEmployee() {
             choices: employeeList
         }])
         .then(response => {
-
+            //create an array which holds each line as a string to use in choices
             let employeeid = response.employee.split(" ")
 
             //remove employee only if first and last name match inputs
@@ -349,4 +354,5 @@ function removeEmployee() {
     });
 };
 
+//initiate function start
 init()
